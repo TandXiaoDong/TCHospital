@@ -1,0 +1,44 @@
+select 
+处方号,
+仓库代码,
+门诊号,
+convert(varchar(19),处方日期,20) as 处方日期,
+姓名,
+性别,
+年龄,
+病情,
+view_section.deptname,
+大夫代码,
+窗口号,
+cfbz 
+from 
+prescription_state_m,
+view_section 
+where 
+convert(varchar(12),处方日期,103) = convert(varchar(12),getdate(),103) 
+and 
+view_section.deptcode=prescription_state_m.记账科室 
+and cfbz='01'  ";
+
+明细：
+select
+n.处方号,
+n.药品代码,
+n.数量,
+n.单价,
+n.用法,
+n.规格,
+n.剂量,
+m.门诊号,
+m.姓名,
+convert(varchar(19),m.处方日期,20) as 处方日期  
+from prescription_detail_view_m n,
+prescription_state_m m 
+where 
+m.处方号='" + prescNo + "' 
+and m.处方号=n.处方号 
+and convert(varchar(12),m.处方日期,103) = convert(varchar(12),getdate(),103)";		
+                
+                
+
+

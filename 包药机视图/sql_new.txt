@@ -1,0 +1,128 @@
+明细：
+select PHARMACY	药房代码：默认1
+PRESCRIPTIONNO	处方号
+PATIENTID	病人ID
+PATIENTNAME	病人姓名
+SEX		性别
+AGE		年龄
+PRESCRIPTIONDATE处方时间
+DEPTNAME	科室名称
+WINDOWSNO	窗口号：无
+DRUGCODE	药品代码
+DRUGSPEC	规格
+FIRMID		厂家
+QUANTITY	数量：20/2.0
+PRESCRIPTIONUNIT单位：片/瓶
+PRICE		价格：0.14950
+USEFREQUENCY	每天两次
+USEDOSAGE	0.50g/500ml/0.10mg
+USEROUTE	口服/静脉注射
+REMARK  
+from PRESCRIPTION_DETAIL_VIEW t where patientname='张三'
+
+处方信息：
+select PRESCRIPTIONNO,
+PRESCRIPTIONDATE,
+PATIENTNAME,
+SEX,
+AGE,
+DEPTNAME,
+WINDOWSNO
+from 
+PRESCRIPTION_DETAIL_VIEW 
+where 
+to_char(PRESCRIPTIONDATE,'yyyymmdd')=to_char(sysdate,'yyyymmdd')
+处方明细：
+select PRESCRIPTIONNO,
+DRUGCODE,
+QUANTITY,
+PRICE,
+USEFREQUENCY,
+DRUGSPEC,
+USEDOSAGE,
+PATIENTNAME,
+PRESCRIPTIONDATE
+from
+PRESCRIPTION_DETAIL_VIEW 
+where
+to_char(PRESCRIPTIONDATE,'yyyymmdd')=to_char(sysdate,'yyyymmdd')
+
+药品视图：
+PHARMACY	药房代码
+DRUGCODE	药品代码
+SHORTCODE	拼音简码
+DRUGNAME	药品名称
+DRUGSPEC	药品规格
+DRUGTYPE	药品类型：西医/中医
+FIRMID		生产厂家ID
+MANUFACTORY	生产厂家
+DOSAGE		剂量类型：粉剂/片剂/水剂/溶液剂等
+UNIT		单位：支/盒/瓶
+DOSE_PER_UNIT	每单位剂量：1.50g/150.00ml
+select *  from  DRUG_view
+
+批号：
+DRUGID		药品ID
+MANUBATCH	
+MANUDATE
+DRUGSPEC
+
+select *  from  drug_batch_view
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
