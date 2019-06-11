@@ -154,6 +154,7 @@ namespace TCTest
                     string dosage = reader[6].ToString().Trim();
                     string name = reader[7].ToString().Trim();
                     string prescDate = reader[8].ToString().Trim();
+                    prescDate = Convert.ToDateTime(prescDate).ToString("yyyy-MM-dd HH:mm:ss");
                     string num = reader[2].ToString().Trim();
                     string presctionUnit= "";
 
@@ -294,6 +295,7 @@ namespace TCTest
                             MySqlCommand cmdM = new MySqlCommand(mysql, con);
                             cmdM.CommandText = mysql;
                             int rd = cmdM.ExecuteNonQuery();
+                        log.info($"插入处方明细成功 {rd}");
                         //}
                         //else { 
                         //    执行处方明细更新
@@ -394,7 +396,8 @@ namespace TCTest
                 while (reader.Read())
                 {
                     prescNo = reader[0].ToString();                   
-                    string prescDate = (reader[1]).ToString();                   
+                    string prescDate = (reader[1]).ToString();
+                    prescDate = Convert.ToDateTime(prescDate).ToString("yyyy-MM-dd HH:mm:ss");
                     name = reader[2].ToString();
                     string sex_his = reader[3].ToString();
                     string sex;
@@ -415,6 +418,8 @@ namespace TCTest
                         log.info($"ckhm is null ,set default value {ckhm}");
                     }
                     string age = age_h + " " + chargeDept;
+
+                    log.info($"姓名：{name} 处方号：{prescNo}");
                     //将处方插入本地数据库
                     string strMysql = ConfigurationManager.ConnectionStrings["strCon"].ToString();
                     MySqlConnection con = new MySqlConnection(strMysql);
@@ -428,11 +433,12 @@ namespace TCTest
                         //判断本地库中没有相同的处方 
                         if (!checkPrescList(prescNo))
                         {//本地数据库没有该处方，执行插入操作
+                            log.info($"开始插入到本地...");
                             con.Open();
                             MySqlCommand cmdM = new MySqlCommand(mysql, con);
                             cmdM.CommandText = mysql;
                             cmdM.ExecuteNonQuery();
-
+                            log.info($"插入到本地成功...");
                             //更新最新一条数据到界面
                             prescDetail(prescNo);
                             textBox1.Text = "处方号：" + prescNo + "   姓名：" + name;
