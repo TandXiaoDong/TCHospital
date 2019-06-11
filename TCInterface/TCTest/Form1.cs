@@ -152,11 +152,12 @@ namespace TCTest
                     string usage = reader[4].ToString().Trim();
                     string drugSpec = reader[5].ToString().Trim();
                     string dosage = reader[6].ToString().Trim();
-                    string name = reader[8].ToString().Trim();
-                    string prescDate = reader[9].ToString().Trim();
+                    string name = reader[7].ToString().Trim();
+                    string prescDate = reader[8].ToString().Trim();
                     string num = reader[2].ToString().Trim();
                     string presctionUnit= "";
 
+                    log.info($"读取处方明细 姓名{name}");
                     //插入前将药品单位转换：;处方中有的药可能在本地药品库中找不到，需要添加判断，处方中的这种药品是否在本地中有这个药，没有便不执行
                     if (checkDrugView(drugCode))
                     {
@@ -408,6 +409,11 @@ namespace TCTest
                     string age_h = reader[4].ToString();
                     string chargeDept = reader[5].ToString();
                     string ckhm = reader[6].ToString();
+                    if (string.IsNullOrEmpty(ckhm))
+                    {
+                        ckhm = "1";
+                        log.info($"ckhm is null ,set default value {ckhm}");
+                    }
                     string age = age_h + " " + chargeDept;
                     //将处方插入本地数据库
                     string strMysql = ConfigurationManager.ConnectionStrings["strCon"].ToString();
