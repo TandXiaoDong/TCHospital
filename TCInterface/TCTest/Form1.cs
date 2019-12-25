@@ -10,6 +10,7 @@ using System.Configuration;
 using System.Data.OleDb;
 using MySql.Data.MySqlClient;
 using System.Threading;
+using TCInterface;
 
 namespace TCTest
 {
@@ -135,7 +136,7 @@ namespace TCTest
                     "QUANTITY,PRICE,USEFREQUENCY," +
                     "DRUGSPEC,USEDOSAGE," +
                     "PATIENTNAME,PRESCRIPTIONDATE " +
-                    "from PRESCRIPTION_DETAIL_VIEW " +
+                    "from PRESCRIPTION_DETAIL_VIEW_Z " +
                     "where to_char(PRESCRIPTIONDATE, 'yyyymmdd') = to_char(sysdate, 'yyyymmdd')";
                 cmd = new OleDbCommand();
                 cmd.Connection = conn;
@@ -384,7 +385,7 @@ namespace TCTest
                 string sql = "select " +
                     "PRESCRIPTIONNO,PRESCRIPTIONDATE," +
                     "PATIENTNAME,SEX,AGE,DEPTNAME,WINDOWSNO " +
-                    "from PRESCRIPTION_DETAIL_VIEW " +
+                    "from PRESCRIPTION_DETAIL_VIEW_Z " +
                     "where to_char(PRESCRIPTIONDATE, 'yyyymmdd') = to_char(sysdate, 'yyyymmdd')";
                 //Boolean boo = false;
                 cmd = new OleDbCommand();
@@ -781,6 +782,117 @@ namespace TCTest
         private void timer1_Tick(object sender, EventArgs e)
         {
             label1.Text = System.DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"); 
+        }
+
+        private void TestDB()
+        {
+            DataTable dt = new DataTable();
+            dt.Columns.Add("");
+            string conString = ConfigurationManager.ConnectionStrings["oledbString"].ToString();
+            OleDbConnection conn = new OleDbConnection(conString);
+            OleDbDataReader reader = null;
+            OleDbCommand cmd = null;
+            try
+            {
+                string sql = "select " +
+                    "PRESCRIPTIONNO,PRESCRIPTIONDATE," +
+                    "PATIENTNAME,SEX,AGE " +
+                    "from PRESCRIPTION_DETAIL_VIEW_Z ";
+                    //"where to_char(PRESCRIPTIONDATE, 'yyyymmdd') = to_char(sysdate, 'yyyymmdd')";
+                //Boolean boo = false;
+                cmd = new OleDbCommand();
+                cmd.Connection = conn;
+                cmd.CommandText = sql;
+                if (cmd.Connection.State != ConnectionState.Open)
+                { 
+                    cmd.Connection.Open(); 
+                }
+                reader = cmd.ExecuteReader();
+                int i = 0;
+                while (reader.Read())
+                {
+                    prescNo = reader[0].ToString();
+                    string prescDate = (reader[1]).ToString();
+                    prescDate = Convert.ToDateTime(prescDate).ToString("yyyy-MM-dd HH:mm:ss");
+                    name = reader[2].ToString();
+                    string sex_his = reader[3].ToString();
+                    string sex;
+                    if (sex_his.Equals("1"))
+                    {
+                        sex = "男";
+                    }
+                    else
+                    {
+                        sex = "女";
+                    }
+                    string age_h = reader[4].ToString();
+                    string chargeDept = reader[5].ToString();
+                    string ckhm = reader[6].ToString();
+                    if (string.IsNullOrEmpty(ckhm))
+                    {
+                        ckhm = "1";
+                        log.info($"ckhm is null ,set default value {ckhm}");
+                    }
+                    string age = age_h + " " + chargeDept;
+
+                    log.info($"姓名：{name} 处方号：{prescNo}");
+                    //将处方插入本地数据库
+                    string strMysql = ConfigurationManager.ConnectionStrings["strCon"].ToString();
+                    MySqlConnection con = new MySqlConnection(strMysql);
+
+                    string mysql = "insert into prescriptionlist(PrescriptionNo,Pharmacy,PatientID,PrescriptionDate,PatientName,Sex,Age,Diagnosis,DeptCode,DoctorCode,FetchWindow,State ) " +
+                        "values('" + prescNo + "','','','" + prescDate + "','" + name + "','" + sex + "','" + age + "','','" + chargeDept + "','','" + ckhm + "','')";
+                    string myUpdate = "update prescriptionlist set PrescriptionNo='" + prescNo + "'where PrescriptionNo='" + prescNo + "'";
+                    if (i > 100)
+                        break;
+                    i++;
+                }
+            }
+            catch (Exception ex)
+            {
+                log.info("readPresclistFail:" + ex.Message);
+            }
+            finally
+            {
+                if (cmd.Connection.State == ConnectionState.Open)
+                {
+                    reader.Close();
+                    reader.Dispose();
+                    cmd.Connection.Close();
+                    conn.Dispose();
+                }
+            }
+        }
+
+        private void btn_read_Click(object sender, EventArgs e)
+        {
+            TestDB();
+            return;
+            var sqlText = this.textBox2.Text.Trim();
+            var constring = ConfigurationManager.ConnectionStrings["oracleConString"].ToString();
+            var dt = OracleHelper.ExecToSqlGetTable(sqlText,constring);
+            if (dt.Rows.Count < 1)
+                return;
+            this.textBox3.Text = dt.Rows.Count+"";
+            this.dataGridView1.DataSource = dt;
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            string sql = "select " +
+              "PRESCRIPTIONNO,PRESCRIPTIONDATE," +
+              "PATIENTNAME,SEX,AGE,DEPTNAME,WINDOWSNO " +
+              "from PRESCRIPTION_DETAIL_VIEW " +
+              "where to_char(PRESCRIPTIONDATE, 'yyyymmdd') = to_char(sysdate, 'yyyymmdd')";
+            this.textBox2.Text = sql;
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            string sql = "select * " +
+             "from PRESCRIPTION_DETAIL_VIEW " +
+             "where to_char(PRESCRIPTIONDATE, 'yyyymmdd') = to_char(sysdate, 'yyyymmdd')";
+            this.textBox2.Text = sql;
         }
     }
 }
