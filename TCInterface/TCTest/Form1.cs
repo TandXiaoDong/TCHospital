@@ -7,10 +7,13 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using System.Configuration;
-using System.Data.OleDb;
+//using System.Data.OleDb;
 using MySql.Data.MySqlClient;
 using System.Threading;
 using TCInterface;
+using SharpContent.ApplicationBlocks.Data;
+using Oracle.ManagedDataAccess.Client;
+using Oracle.ManagedDataAccess.Types;
 
 namespace TCTest
 {
@@ -28,6 +31,9 @@ namespace TCTest
         LogManager log = new LogManager();
         private void Form1_Load(object sender, EventArgs e)
         {
+            ConnectDBTest();
+
+            return;
             Thread t = new Thread(new ThreadStart(DoPresc));
             t.IsBackground = true; 
             t.Start();
@@ -62,19 +68,21 @@ namespace TCTest
         private void DodbManager()
         {
             while (true)
-            {//8h更新一次28800000
+            {   //8h更新一次28800000
                 dbManager db = new dbManager();
                 db.dbManagers_insert();
                 db.dbManagers_delete();
                 Thread.Sleep(28800000);
             }
         }
+
+        #region 未使用
         private void hisCon(string sql){
-            string strCon = ConfigurationManager.ConnectionStrings["oledbSqlServer"].ToString();
-            OleDbConnection con = new OleDbConnection(strCon);
-            OleDbCommand cmd = null;
+            string strCon = ConfigurationManager.ConnectionStrings["oracleConString"].ToString();
+            OracleConnection con = new OracleConnection(strCon);
+            OracleCommand cmd = null;
             try{
-            cmd = new OleDbCommand();
+            cmd = new OracleCommand();
             cmd.Connection = con;
             cmd.CommandText=sql;
             if (cmd.Connection.State != ConnectionState.Open)
@@ -120,12 +128,14 @@ namespace TCTest
             }
             return true;
         }
+
+        #endregion
         private void prescDetail(string prescNo) { 
         //更新处方明细
-            string conString = ConfigurationManager.ConnectionStrings["oledbString"].ToString();
-            OleDbConnection conn = new OleDbConnection(conString);
-            OleDbDataReader reader = null;
-            OleDbCommand cmd = null;
+            string conString = ConfigurationManager.ConnectionStrings["oracleConString"].ToString();
+            OracleConnection conn = new OracleConnection(conString);
+            OracleDataReader reader = null;
+            OracleCommand cmd = null;
             try
             {
                 //string sql = "select n.处方号,n.药品代码,n.数量,n.单价,n.用法,n.规格,n.剂量,m.门诊号,m.姓名,convert(varchar(19),m.处方日期,20) as 处方日期  from prescription_detail_view_m n,prescription_state_m m where m.处方号='" + prescNo + "' and m.处方号=n.处方号 and convert(varchar(12),m.处方日期,103) = convert(varchar(12),getdate(),103)";
@@ -138,7 +148,7 @@ namespace TCTest
                     "PATIENTNAME,PRESCRIPTIONDATE " +
                     "from PRESCRIPTION_DETAIL_VIEW_Z " +
                     "where to_char(PRESCRIPTIONDATE, 'yyyymmdd') = to_char(sysdate, 'yyyymmdd')";
-                cmd = new OleDbCommand();
+                cmd = new OracleCommand();
                 cmd.Connection = conn;
                 cmd.CommandText = sql;
                 if (cmd.Connection.State != ConnectionState.Open)
@@ -372,10 +382,10 @@ namespace TCTest
         }
         private void prescList()
         {//更新处方信息
-            string conString = ConfigurationManager.ConnectionStrings["oledbString"].ToString();
-            OleDbConnection conn = new OleDbConnection(conString);
-            OleDbDataReader reader = null;
-            OleDbCommand cmd = null;
+            string conString = ConfigurationManager.ConnectionStrings["oracleConString"].ToString();
+            OracleConnection conn = new OracleConnection(conString);
+            OracleDataReader reader = null;
+            OracleCommand cmd = null;
             try
             {
                 //string sql = "select 处方号,仓库代码,门诊号,convert(varchar(19),处方日期,20) as 处方日期,姓名,性别,年龄,病情,view_section.deptname,大夫代码,窗口号,cfbz from prescription_state_m,view_section where convert(varchar(12),处方日期,103) = convert(varchar(12),getdate(),103) and view_section.deptcode=prescription_state_m.记账科室 and cfbz='01'  ";
@@ -384,15 +394,17 @@ namespace TCTest
                 //string sql = "select 处方号,仓库代码,门诊号 ,处方日期,姓名,性别,年龄,病情,记账科室,大夫代码,发药日期,窗口号 from prescription_state_m where convert(varchar(12),处方日期,103) = convert(varchar(12),getdate(),103)";
                 string sql = "select " +
                     "PRESCRIPTIONNO,PRESCRIPTIONDATE," +
-                    "PATIENTNAME,SEX,AGE,DEPTNAME,WINDOWSNO " +
+                    "PATIENTNAME,SEX,AGE" +//,DEPTNAME,WINDOWSNO 
                     "from PRESCRIPTION_DETAIL_VIEW_Z " +
                     "where to_char(PRESCRIPTIONDATE, 'yyyymmdd') = to_char(sysdate, 'yyyymmdd')";
                 //Boolean boo = false;
-                cmd = new OleDbCommand();
+                cmd = new OracleCommand();
                 cmd.Connection = conn;
                 cmd.CommandText = sql;
                 if (cmd.Connection.State != ConnectionState.Open)
-                { cmd.Connection.Open(); }
+                { 
+                    cmd.Connection.Open(); 
+                }
                 reader = cmd.ExecuteReader();
                 while (reader.Read())
                 {
@@ -411,8 +423,8 @@ namespace TCTest
                         sex = "女";
                     }
                     string age_h = reader[4].ToString();
-                    string chargeDept = reader[5].ToString();
-                    string ckhm = reader[6].ToString();
+                    string chargeDept = "";//reader[5].ToString();
+                    string ckhm = "";//reader[6].ToString();
                     if (string.IsNullOrEmpty(ckhm))
                     {
                         ckhm = "1";
@@ -550,14 +562,14 @@ namespace TCTest
         }
         private void drugView()
         {
-            string conString = ConfigurationManager.ConnectionStrings["oledbSqlServer"].ToString();
-            OleDbConnection conn = new OleDbConnection(conString);
-            OleDbDataReader reader = null;
-            OleDbCommand cmd = null;
+            string conString = ConfigurationManager.ConnectionStrings["oracleConString"].ToString();
+            OracleConnection conn = new OracleConnection(conString);
+            OracleDataReader reader = null;
+            OracleCommand cmd = null;
             try
             {
                 string sql = "select 药品代码,药品名称,拼音代码,计量单位,规格,计量,剂型 from drug_view";
-                cmd = new OleDbCommand();
+                cmd = new OracleCommand();
                 cmd.Connection = conn;
                 cmd.CommandText = sql;
                 if (cmd.Connection.State != ConnectionState.Open)
@@ -671,14 +683,14 @@ namespace TCTest
         }
         private void drugExpDate()
         {
-            string conString = ConfigurationManager.ConnectionStrings["oledbSqlServer"].ToString();
-            OleDbConnection conn = new OleDbConnection(conString);
-            OleDbDataReader reader = null;
-            OleDbCommand cmd = null;
+            string conString = ConfigurationManager.ConnectionStrings["oracleConString"].ToString();
+            OracleConnection conn = new OracleConnection(conString);
+            OracleDataReader reader = null;
+            OracleCommand cmd = null;
             try
             {
                 string sql = "select 药品代码,生产批号,convert(varchar(19),有效期,20) as 有效期 ,生产厂家代码 from drug_batch_view";
-                cmd = new OleDbCommand();
+                cmd = new OracleCommand();
                 cmd.Connection = conn;
                 cmd.CommandText = sql;
                 if (cmd.Connection.State != ConnectionState.Open)
@@ -754,6 +766,7 @@ namespace TCTest
                 }
             }
         }
+
         //private void prescShow()
         //{
         //    //将药品数据更新到本地数据后显示到用户界面                           
@@ -784,115 +797,84 @@ namespace TCTest
             label1.Text = System.DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"); 
         }
 
-        private void TestDB()
+        private void ConnectDBTest()
         {
-            DataTable dt = new DataTable();
-            dt.Columns.Add("");
-            string conString = ConfigurationManager.ConnectionStrings["oledbString"].ToString();
-            OleDbConnection conn = new OleDbConnection(conString);
-            OleDbDataReader reader = null;
-            OleDbCommand cmd = null;
+            #region OracleConnection
             try
             {
-                string sql = "select " +
-                    "PRESCRIPTIONNO,PRESCRIPTIONDATE," +
-                    "PATIENTNAME,SEX,AGE " +
-                    "from PRESCRIPTION_DETAIL_VIEW_Z ";
-                    //"where to_char(PRESCRIPTIONDATE, 'yyyymmdd') = to_char(sysdate, 'yyyymmdd')";
-                //Boolean boo = false;
-                cmd = new OleDbCommand();
-                cmd.Connection = conn;
-                cmd.CommandText = sql;
-                if (cmd.Connection.State != ConnectionState.Open)
-                { 
-                    cmd.Connection.Open(); 
-                }
-                reader = cmd.ExecuteReader();
-                int i = 0;
-                while (reader.Read())
+                log.info("开始连接...");
+                //var sqlString = "Data Source=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=127.0.0.1)(PORT=1521))(CONNECT_DATA=(SERVICE_NAME=tcdb)));User Id=zdby;Password=zdby";
+                //var conString = "Data Source=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=127.0.0.1)(PORT=1521))(CONNECT_DATA=(SERVICE_NAME=tcdb)));User Id=zdby;Password=zdby";
+                string conString = ConfigurationManager.ConnectionStrings["oracleConString"].ToString();
+                OracleConnection oralceConnection = new OracleConnection(conString);
+                oralceConnection.Open();
+                OracleCommand oracleCommand = new OracleCommand();
+                var sql = "select * from PRESCRIPTION_DETAIL_VIEW";
+                oracleCommand.CommandText = sql; //"select * from tctb1 t";//"
+                oracleCommand.CommandType = CommandType.Text;
+                oracleCommand.Connection = oralceConnection;
+                if (oracleCommand.Connection.State != ConnectionState.Open)
                 {
-                    prescNo = reader[0].ToString();
-                    string prescDate = (reader[1]).ToString();
-                    prescDate = Convert.ToDateTime(prescDate).ToString("yyyy-MM-dd HH:mm:ss");
-                    name = reader[2].ToString();
-                    string sex_his = reader[3].ToString();
-                    string sex;
-                    if (sex_his.Equals("1"))
-                    {
-                        sex = "男";
-                    }
-                    else
-                    {
-                        sex = "女";
-                    }
-                    string age_h = reader[4].ToString();
-                    string chargeDept = reader[5].ToString();
-                    string ckhm = reader[6].ToString();
-                    if (string.IsNullOrEmpty(ckhm))
-                    {
-                        ckhm = "1";
-                        log.info($"ckhm is null ,set default value {ckhm}");
-                    }
-                    string age = age_h + " " + chargeDept;
-
-                    log.info($"姓名：{name} 处方号：{prescNo}");
-                    //将处方插入本地数据库
-                    string strMysql = ConfigurationManager.ConnectionStrings["strCon"].ToString();
-                    MySqlConnection con = new MySqlConnection(strMysql);
-
-                    string mysql = "insert into prescriptionlist(PrescriptionNo,Pharmacy,PatientID,PrescriptionDate,PatientName,Sex,Age,Diagnosis,DeptCode,DoctorCode,FetchWindow,State ) " +
-                        "values('" + prescNo + "','','','" + prescDate + "','" + name + "','" + sex + "','" + age + "','','" + chargeDept + "','','" + ckhm + "','')";
-                    string myUpdate = "update prescriptionlist set PrescriptionNo='" + prescNo + "'where PrescriptionNo='" + prescNo + "'";
-                    if (i > 100)
-                        break;
+                    log.info("连接失败");
+                }
+                else if (oracleCommand.Connection.State == ConnectionState.Open)
+                {
+                    log.info("连接成功");
+                }
+                log.info(sql);
+                var oracleReader = oracleCommand.ExecuteReader();
+                var b = oracleReader.HasRows;
+                log.info("读取数据状态："+b);
+                int i = 0;
+                while (oracleReader.Read())
+                {
+                    var v1 = oracleReader[0];
+                    var v2 = oracleReader[1];
+                    log.info(v1 + "  " + v2);
+                    this.textBox1.Text += v1 + "  " + v2;
                     i++;
+                    if (i == 10)
+                        break;
+                }
+                oralceConnection.Close();
+            }
+            catch (Exception ex)
+            {
+                log.info("test db status:" + ex.Message + ex.StackTrace);
+            }
+            #endregion
+        }
+
+        public void SelectDBTest()
+        {
+            //连接字符串
+            var sqlString =   "Data Source=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=123.123.123.41)(PORT=1521))(CONNECT_DATA=(SERVICE_NAME=csk)));User Id=tcyybyj;Password=tcyybyj";
+            var connString = @"Data Source=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=192.168.0.175)(PORT=1521))(CONNECT_DATA=(SERVICE_NAME=tcdb)));User ID=zdby;Password=zdby";
+            try
+            {
+                //测试:通过DataReader简单查询
+                using (OracleConnection con = new OracleConnection(connString))
+                {
+                    con.Open();
+                    using (OracleCommand com = con.CreateCommand())
+                    {
+                        com.CommandText = "select * from TCTB1 t";
+                        using (OracleDataReader reader = com.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                //var v1 = reader["stuid"].ToString();
+                                var v2 = reader[0].ToString();
+                            }
+                        }
+                    }
+                    Console.WriteLine("查询完毕！"); ;
                 }
             }
             catch (Exception ex)
             {
-                log.info("readPresclistFail:" + ex.Message);
+                Console.WriteLine(ex.ToString());
             }
-            finally
-            {
-                if (cmd.Connection.State == ConnectionState.Open)
-                {
-                    reader.Close();
-                    reader.Dispose();
-                    cmd.Connection.Close();
-                    conn.Dispose();
-                }
-            }
-        }
-
-        private void btn_read_Click(object sender, EventArgs e)
-        {
-            TestDB();
-            return;
-            var sqlText = this.textBox2.Text.Trim();
-            var constring = ConfigurationManager.ConnectionStrings["oracleConString"].ToString();
-            var dt = OracleHelper.ExecToSqlGetTable(sqlText,constring);
-            if (dt.Rows.Count < 1)
-                return;
-            this.textBox3.Text = dt.Rows.Count+"";
-            this.dataGridView1.DataSource = dt;
-        }
-
-        private void button1_Click(object sender, EventArgs e)
-        {
-            string sql = "select " +
-              "PRESCRIPTIONNO,PRESCRIPTIONDATE," +
-              "PATIENTNAME,SEX,AGE,DEPTNAME,WINDOWSNO " +
-              "from PRESCRIPTION_DETAIL_VIEW " +
-              "where to_char(PRESCRIPTIONDATE, 'yyyymmdd') = to_char(sysdate, 'yyyymmdd')";
-            this.textBox2.Text = sql;
-        }
-
-        private void button2_Click(object sender, EventArgs e)
-        {
-            string sql = "select * " +
-             "from PRESCRIPTION_DETAIL_VIEW " +
-             "where to_char(PRESCRIPTIONDATE, 'yyyymmdd') = to_char(sysdate, 'yyyymmdd')";
-            this.textBox2.Text = sql;
         }
     }
 }

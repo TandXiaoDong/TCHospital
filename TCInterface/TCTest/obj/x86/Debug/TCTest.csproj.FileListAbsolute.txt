@@ -20,4 +20,5 @@ F:\work\MyRepository\otherProj\TCHospital\TCInterface\TCTest\obj\x86\Debug\TCTes
 F:\work\MyRepository\otherProj\TCHospital\TCInterface\TCTest\obj\x86\Debug\TCInterface.exe
 F:\work\MyRepository\otherProj\TCHospital\TCInterface\TCTest\obj\x86\Debug\TCInterface.pdb
 F:\work\MyRepository\otherProj\TCHospital\TCInterface\TCTest\bin\Debug\Oracle.ManagedDataAccess.dll
+F:\work\MyRepository\otherProj\TCHospital\TCInterface\TCTest\bin\Debug\Oracle.DataAccess.dll
 F:\work\MyRepository\otherProj\TCHospital\TCInterface\TCTest\obj\x86\Debug\TCTest.csprojAssemblyReference.cache
