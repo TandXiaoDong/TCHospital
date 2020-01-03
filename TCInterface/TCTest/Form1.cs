@@ -31,9 +31,7 @@ namespace TCTest
         LogManager log = new LogManager();
         private void Form1_Load(object sender, EventArgs e)
         {
-            ConnectDBTest();
-
-            return;
+            //ConnectDBTest();
             Thread t = new Thread(new ThreadStart(DoPresc));
             t.IsBackground = true; 
             t.Start();
@@ -142,11 +140,11 @@ namespace TCTest
                 //,n.生产厂家,convert(varchar(12),m.处方日期,103) as 处方日期
                 //string sql = "select n.处方号,n.药品代码,n.数量,n.单价,n.用法,n.规格,n.剂量 from prescription_detail_view_m n,prescription_state_m m where m.处方号=n.处方号 and convert(varchar(12),m.处方日期,103) = convert(varchar(12),getdate(),103)";
                 string sql = "select " +
-                    "PRESCRIPTIONNO,DRUGCODE," +
+                    "PRESCRIPTIONNO,DRUGID," +
                     "QUANTITY,PRICE,USEFREQUENCY," +
                     "DRUGSPEC,USEDOSAGE," +
                     "PATIENTNAME,PRESCRIPTIONDATE " +
-                    "from PRESCRIPTION_DETAIL_VIEW_Z " +
+                    "from PRESCRIPTION_DETAIL_VIEW " +
                     "where to_char(PRESCRIPTIONDATE, 'yyyymmdd') = to_char(sysdate, 'yyyymmdd')";
                 cmd = new OracleCommand();
                 cmd.Connection = conn;
@@ -395,7 +393,7 @@ namespace TCTest
                 string sql = "select " +
                     "PRESCRIPTIONNO,PRESCRIPTIONDATE," +
                     "PATIENTNAME,SEX,AGE" +//,DEPTNAME,WINDOWSNO 
-                    "from PRESCRIPTION_DETAIL_VIEW_Z " +
+                    "from PRESCRIPTION_DETAIL_VIEW " +
                     "where to_char(PRESCRIPTIONDATE, 'yyyymmdd') = to_char(sysdate, 'yyyymmdd')";
                 //Boolean boo = false;
                 cmd = new OracleCommand();
@@ -568,7 +566,8 @@ namespace TCTest
             OracleCommand cmd = null;
             try
             {
-                string sql = "select 药品代码,药品名称,拼音代码,计量单位,规格,计量,剂型 from drug_view";
+                //string sql = "select 药品代码,药品名称,拼音代码,计量单位,规格,计量,剂型 from drug_view";
+                var sql = "select drugcode,drugname,shortcode,unit,drugspec,dose_per_unit,drugtype from drug_view";
                 cmd = new OracleCommand();
                 cmd.Connection = conn;
                 cmd.CommandText = sql;
@@ -689,7 +688,9 @@ namespace TCTest
             OracleCommand cmd = null;
             try
             {
-                string sql = "select 药品代码,生产批号,convert(varchar(19),有效期,20) as 有效期 ,生产厂家代码 from drug_batch_view";
+                //string sql = "select 药品代码,生产批号,convert(varchar(19),有效期,20) as 有效期 ,生产厂家代码 from drug_batch_view";
+                var sql = "select drugid,manubatch,convert(varchar(19),manudate,20) as startDate," +
+                    "convert(varchar(19),drugspec,20) as endDate from drug_batch_view";
                 cmd = new OracleCommand();
                 cmd.Connection = conn;
                 cmd.CommandText = sql;
