@@ -38,13 +38,12 @@
             // 
             // textBox1
             // 
-            this.textBox1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.textBox1.Font = new System.Drawing.Font("宋体", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.textBox1.Location = new System.Drawing.Point(0, 0);
+            this.textBox1.Location = new System.Drawing.Point(0, 54);
             this.textBox1.Multiline = true;
             this.textBox1.Name = "textBox1";
             this.textBox1.ReadOnly = true;
-            this.textBox1.Size = new System.Drawing.Size(595, 489);
+            this.textBox1.Size = new System.Drawing.Size(595, 435);
             this.textBox1.TabIndex = 4;
             // 
             // timer1
@@ -67,11 +66,11 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(7, 9);
+            this.label2.Location = new System.Drawing.Point(7, 26);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(65, 12);
+            this.label2.Size = new System.Drawing.Size(89, 12);
             this.label2.TabIndex = 6;
-            this.label2.Text = "处方信息：";
+            this.label2.Text = "当前处方信息：";
             // 
             // Form1
             // 
