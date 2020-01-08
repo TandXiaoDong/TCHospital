@@ -8,4 +8,20 @@ D:\WorkDocument\companytype\TiTanUnion\唐城医院\project\TCInterface\TCTest\o
 D:\WorkDocument\companytype\TiTanUnion\唐城医院\project\TCInterface\TCTest\obj\x86\Debug\TCTest.csproj.CopyComplete
 D:\WorkDocument\companytype\TiTanUnion\唐城医院\project\TCInterface\TCTest\obj\x86\Debug\TCInterface.exe
 D:\WorkDocument\companytype\TiTanUnion\唐城医院\project\TCInterface\TCTest\obj\x86\Debug\TCInterface.pdb
+<<<<<<< HEAD
 D:\WorkDocument\companytype\TiTanUnion\唐城医院\project\TCInterface\TCTest\obj\x86\Debug\TCTest.csprojAssemblyReference.cache
+=======
+F:\work\MyRepository\otherProj\TCHospital\TCInterface\TCTest\bin\Debug\TCInterface.exe.config
+F:\work\MyRepository\otherProj\TCHospital\TCInterface\TCTest\bin\Debug\TCInterface.exe
+F:\work\MyRepository\otherProj\TCHospital\TCInterface\TCTest\bin\Debug\TCInterface.pdb
+F:\work\MyRepository\otherProj\TCHospital\TCInterface\TCTest\bin\Debug\MySql.Data.dll
+F:\work\MyRepository\otherProj\TCHospital\TCInterface\TCTest\obj\x86\Debug\TCTest.Form1.resources
+F:\work\MyRepository\otherProj\TCHospital\TCInterface\TCTest\obj\x86\Debug\TCInterface.Properties.Resources.resources
+F:\work\MyRepository\otherProj\TCHospital\TCInterface\TCTest\obj\x86\Debug\TCTest.csproj.GenerateResource.cache
+F:\work\MyRepository\otherProj\TCHospital\TCInterface\TCTest\obj\x86\Debug\TCTest.csproj.CopyComplete
+F:\work\MyRepository\otherProj\TCHospital\TCInterface\TCTest\obj\x86\Debug\TCInterface.exe
+F:\work\MyRepository\otherProj\TCHospital\TCInterface\TCTest\obj\x86\Debug\TCInterface.pdb
+F:\work\MyRepository\otherProj\TCHospital\TCInterface\TCTest\bin\Debug\Oracle.ManagedDataAccess.dll
+F:\work\MyRepository\otherProj\TCHospital\TCInterface\TCTest\bin\Debug\Oracle.DataAccess.dll
+F:\work\MyRepository\otherProj\TCHospital\TCInterface\TCTest\obj\x86\Debug\TCTest.csprojAssemblyReference.cache
+>>>>>>> 89440d26f8bae4c81688cdd4ba4f9f7eda721139
