@@ -5,7 +5,7 @@ D:\WorkDocument\companytype\TiTanUnion\唐城医院\project\TCInterface\TCTest\b
 D:\WorkDocument\companytype\TiTanUnion\唐城医院\project\TCInterface\TCTest\obj\x86\Debug\TCTest.Form1.resources
 D:\WorkDocument\companytype\TiTanUnion\唐城医院\project\TCInterface\TCTest\obj\x86\Debug\TCInterface.Properties.Resources.resources
 D:\WorkDocument\companytype\TiTanUnion\唐城医院\project\TCInterface\TCTest\obj\x86\Debug\TCTest.csproj.GenerateResource.cache
-D:\WorkDocument\companytype\TiTanUnion\唐城医院\project\TCInterface\TCTest\obj\x86\Debug\TCTest.csproj.CoreCompileInputs.cache
 D:\WorkDocument\companytype\TiTanUnion\唐城医院\project\TCInterface\TCTest\obj\x86\Debug\TCTest.csproj.CopyComplete
 D:\WorkDocument\companytype\TiTanUnion\唐城医院\project\TCInterface\TCTest\obj\x86\Debug\TCInterface.exe
 D:\WorkDocument\companytype\TiTanUnion\唐城医院\project\TCInterface\TCTest\obj\x86\Debug\TCInterface.pdb
+D:\WorkDocument\companytype\TiTanUnion\唐城医院\project\TCInterface\TCTest\obj\x86\Debug\TCTest.csprojAssemblyReference.cache
