@@ -166,7 +166,7 @@ namespace TCTest
                     string num = reader[2].ToString().Trim();
                     string presctionUnit= "";
 
-                    log.info($"读取处方明细 姓名{name}");
+                    //log.info($"读取处方明细 姓名{name}");
                     //插入前将药品单位转换：;处方中有的药可能在本地药品库中找不到，需要添加判断，处方中的这种药品是否在本地中有这个药，没有便不执行
                     if (checkDrugView(drugCode))
                     {
@@ -198,8 +198,7 @@ namespace TCTest
                                     number = Convert.ToString(Convert.ToInt32(number) / Convert.ToInt32(Package_Per_Box));
                                     if (!Package_unit.Equals(""))
                                     {
-
-                                            presctionUnit = Package_unit;
+                                         presctionUnit = Package_unit;
                                     }
                                     else
                                     {//整盒发药，单位为大单位
@@ -303,7 +302,7 @@ namespace TCTest
                             MySqlCommand cmdM = new MySqlCommand(mysql, con);
                             cmdM.CommandText = mysql;
                             int rd = cmdM.ExecuteNonQuery();
-                        log.info($"插入处方明细成功 {rd}");
+                        //log.info($"插入处方明细成功 {rd}");
                         //}
                         //else { 
                         //    执行处方明细更新
@@ -348,9 +347,9 @@ namespace TCTest
                 }
             }
         }
-        private Boolean checkPrescList(string presc_no) {
+        private bool checkPrescList(string presc_no) {
             //判断本地数据库中处方表没有重复           
-            string localPrescNo = "select PrescriptionNo,state from prescriptionlist where PrescriptionNo='"+presc_no+"'";
+            string localPrescNo = $"select PrescriptionNo,state from prescriptionlist where PrescriptionNo='{presc_no}'";
             MySqlConnection conn = new MySqlConnection(ConfigurationManager.ConnectionStrings["strCon"].ToString());
             MySqlDataReader rd=null;
             try
@@ -360,14 +359,9 @@ namespace TCTest
                 cmd.CommandText = localPrescNo;
                 //presc_no = rd[0].ToString();
                 rd = cmd.ExecuteReader();
-
-                if(rd.Read())
-                {
-                    presc_no=rd[0].ToString();        
-                }
-                else {
-                    return false;
-                }
+                if (rd.HasRows)
+                    return true;
+                return false;
             }catch(Exception ex){
                 log.info("checkrscList:"+ex.Message);
             }finally{
@@ -375,7 +369,37 @@ namespace TCTest
                 conn.Close();
             }
             //listView1.Items.Add(prescNo);   
-            return true;
+            return false;
+        }
+
+        private bool checkPrescDetail(string presc_no)
+        {
+            //判断本地数据库中处方表没有重复     prescriptiondetail(PrescriptionNo      
+            string localPrescNo = $"select * from prescriptiondetail where PrescriptionNo='{presc_no}'";
+            MySqlConnection conn = new MySqlConnection(ConfigurationManager.ConnectionStrings["strCon"].ToString());
+            MySqlDataReader rd = null;
+            try
+            {
+                conn.Open();
+                MySqlCommand cmd = new MySqlCommand(localPrescNo, conn);
+                cmd.CommandText = localPrescNo;
+                //presc_no = rd[0].ToString();
+                rd = cmd.ExecuteReader();
+                if (rd.HasRows)
+                    return true;
+                return false;
+            }
+            catch (Exception ex)
+            {
+                log.info("checkrscList:" + ex.Message);
+            }
+            finally
+            {
+                rd.Close();
+                conn.Close();
+            }
+            //listView1.Items.Add(prescNo);   
+            return false;
         }
         private void prescList()
         {//更新处方信息
@@ -452,7 +476,10 @@ namespace TCTest
                             cmdM.CommandText = mysql;
                             cmdM.ExecuteNonQuery();
                             //更新最新一条数据到界面
-                            prescDetail(prescNo);
+                            if (!checkPrescDetail(prescNo))
+                            {
+                                prescDetail(prescNo);
+                            }
                             textBox1.Text = "处方号：" + prescNo + "   姓名：" + name;
                             log.info($"插入到本地成功...姓名={name} 处方号={prescNo} ");
                             Application.DoEvents();
