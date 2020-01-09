@@ -50,7 +50,8 @@ namespace TCTest
         {
             while (true)
             {
-                prescList();            
+                prescList(); 
+                Thread.Sleep(500);                
             }
         }
         private void DoDrugView()
@@ -497,7 +498,6 @@ namespace TCTest
                             catch (Exception ex)
                             {
                                 log.info("updatePresclistFail:"+ex.Message);
-
                             }
                             finally
                             {
