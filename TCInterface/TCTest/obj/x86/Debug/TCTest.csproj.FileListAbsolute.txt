@@ -10,3 +10,4 @@ F:\work\MyRepository\otherProj\TCHospital\TCInterface\TCTest\obj\x86\Debug\TCTes
 F:\work\MyRepository\otherProj\TCHospital\TCInterface\TCTest\obj\x86\Debug\TCTest.csproj.CopyComplete
 F:\work\MyRepository\otherProj\TCHospital\TCInterface\TCTest\obj\x86\Debug\TCInterface.exe
 F:\work\MyRepository\otherProj\TCHospital\TCInterface\TCTest\obj\x86\Debug\TCInterface.pdb
+F:\work\MyRepository\otherProj\TCHospital\TCInterface\TCTest\obj\x86\Debug\TCTest.csprojAssemblyReference.cache

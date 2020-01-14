@@ -9,7 +9,9 @@ using MySql.Data.MySqlClient;
 using System.Net;
 using System.Threading;
 using System.Net.Sockets;
-using NEBasic;
+using CommonUtils.Logger;
+using CommonUtils.FileHelper;
+//using NEBasic;
 
 namespace OrderPrint
 {
@@ -106,8 +108,8 @@ namespace OrderPrint
                 {
                     byte[] bytRecv = udpcRecv.Receive(ref remoteIpep);
                     string message = Encoding.UTF8.GetString(bytRecv, 0, bytRecv.Length);
-                //    MessageBox.Show("收到指令：" + code);
-                    NELog.WriteLog("收到指令1：" + message);
+                    //    MessageBox.Show("收到指令：" + code);
+                    LogHelper.Log.Info("收到指令1：" + message);
                     message = message.Substring(0, message.LastIndexOf("*") + 1);
                     message = "$" + DesCode.DESDecode(message.Substring(1, message.Length - 2), "YN200916") + "*";
                     if (message == null || message.Equals("") || message.Length < 5 || !message.Substring(0, 5).Equals("$A712"))
@@ -131,9 +133,9 @@ namespace OrderPrint
             {
                 code = "$" + DesCode.DESEncode(code.Substring(1, code.Length - 2), "YN200916") + "*";
                 byte[] sendbytes = Encoding.UTF8.GetBytes(code);
-
-                IPEndPoint remoteIpep = new IPEndPoint(IPAddress.Parse(NEIni.ReadValue(".\\config.ini", "cfg", "equipmentip", "")), 7015); // 发送到的IP地址和端口号
-                NELog.WriteLog("Q-----------");
+                var path = AppDomain.CurrentDomain.BaseDirectory + "config.ini";
+                IPEndPoint remoteIpep = new IPEndPoint(IPAddress.Parse(INIFile.GetValue("cfg", "equipmentip", path)), 7015); // 发送到的IP地址和端口号
+                LogHelper.Log.Info("Q-----------");
                 int i = udpcRecv.Send(sendbytes, sendbytes.Length, remoteIpep);
             }
             catch (System.Exception ex)

@@ -34,6 +34,8 @@
             this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
+            this.btnDrugUpdate = new System.Windows.Forms.Button();
+            this.btnDrugEx = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // textBox1
@@ -72,11 +74,33 @@
             this.label2.TabIndex = 6;
             this.label2.Text = "当前处方信息：";
             // 
+            // btnDrugUpdate
+            // 
+            this.btnDrugUpdate.Location = new System.Drawing.Point(374, 21);
+            this.btnDrugUpdate.Name = "btnDrugUpdate";
+            this.btnDrugUpdate.Size = new System.Drawing.Size(97, 23);
+            this.btnDrugUpdate.TabIndex = 7;
+            this.btnDrugUpdate.Text = "手动同步药品";
+            this.btnDrugUpdate.UseVisualStyleBackColor = true;
+            this.btnDrugUpdate.Click += new System.EventHandler(this.btnDrugUpdate_Click);
+            // 
+            // btnDrugEx
+            // 
+            this.btnDrugEx.Location = new System.Drawing.Point(486, 21);
+            this.btnDrugEx.Name = "btnDrugEx";
+            this.btnDrugEx.Size = new System.Drawing.Size(97, 23);
+            this.btnDrugEx.TabIndex = 8;
+            this.btnDrugEx.Text = "药品效期";
+            this.btnDrugEx.UseVisualStyleBackColor = true;
+            this.btnDrugEx.Click += new System.EventHandler(this.btnDrugEx_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(595, 489);
+            this.Controls.Add(this.btnDrugEx);
+            this.Controls.Add(this.btnDrugUpdate);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.textBox1);
             this.Controls.Add(this.label1);
@@ -95,6 +119,8 @@
         private System.Windows.Forms.TextBox textBox1;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.Button btnDrugUpdate;
+        private System.Windows.Forms.Button btnDrugEx;
     }
 }
 

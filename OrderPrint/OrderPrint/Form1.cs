@@ -10,8 +10,9 @@ using System.Threading;
 using System.Net.Sockets;
 using System.Net;
 using System.Collections;
-using NEBasic;
+//using NEBasic;
 using MySql.Data.MySqlClient;
+using CommonUtils.Logger;
 
 namespace OrderPrint
 {
@@ -26,7 +27,7 @@ namespace OrderPrint
         {
             this.WindowState = FormWindowState.Maximized;
 
-            NELog.logPath = @".\log";
+            //NELog.logPath = @".\log";
             InitializeComponent();
             view1.MdiParent = this;
             view2.MdiParent = this;
@@ -39,6 +40,7 @@ namespace OrderPrint
             Config.G_DB_USER_STR = INIOperationClass.INIGetStringValue(".\\config.ini", "params", "databaseuser", "root");
             Config.G_DB_PWD_STR = INIOperationClass.INIGetStringValue(".\\config.ini", "params", "databasepwd", "qq1223");
             //MessageBox.Show();
+            view1.Dock = DockStyle.Fill;
             view1.Show();
         }
 
@@ -61,7 +63,7 @@ namespace OrderPrint
                 System.Environment.Exit(0);
             }
             
-            timer1.Interval = 500;
+            timer1.Interval = 5000;
             timer1.Enabled = true;
 
             // 启动灯控制线程
@@ -111,7 +113,7 @@ namespace OrderPrint
                         MessageBox.Show("收到指令：" + message);
                         return;
                     }
-                    NELog.WriteLog("收到指令2：" + message+"-");
+                    LogHelper.Log.Info("收到指令2：" + message+"-");
                     
                     if (message == null || message.Equals("") || message.Length < 5)
                     {
@@ -129,8 +131,8 @@ namespace OrderPrint
                 }
                 catch (Exception ex)
                 {
-                //    MessageBox.Show(ex.ToString());
-                    NELog.WriteLog(ex.ToString());
+                    //    MessageBox.Show(ex.ToString());
+                    LogHelper.Log.Info(ex.ToString());
                     continue;
                 }
             }
@@ -379,7 +381,7 @@ namespace OrderPrint
                 }
                 catch (System.Exception ex)
                 {
-                    NELog.WriteLog(ex.ToString());
+                    LogHelper.Log.Info(ex.ToString());
                 }
                 finally
                 {

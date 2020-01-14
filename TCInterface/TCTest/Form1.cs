@@ -14,6 +14,7 @@ using TCInterface;
 using SharpContent.ApplicationBlocks.Data;
 using Oracle.ManagedDataAccess.Client;
 using Oracle.ManagedDataAccess.Types;
+using System.Threading.Tasks;
 
 namespace TCTest
 {
@@ -36,9 +37,9 @@ namespace TCTest
             t.IsBackground = true; 
             t.Start();
             //设置药品库存更新
-            //Thread thread_drug = new Thread(new ThreadStart(DoDrugView));
-            //thread_drug.IsBackground = true;
-            //thread_drug.Start();
+            Thread thread_drug = new Thread(new ThreadStart(DoDrugView));
+            thread_drug.IsBackground = true;
+            thread_drug.Start();
 
             //////设置数据库管理
             //Thread th_d = new Thread(new ThreadStart(DodbManager));
@@ -59,7 +60,7 @@ namespace TCTest
             while (true)
             {
                 drugView();
-                drugExpDate();
+                //drugExpDate();
                 Thread.Sleep(10800000);
             }
         }
@@ -139,13 +140,14 @@ namespace TCTest
                 //string sql = "select n.处方号,n.药品代码,n.数量,n.单价,n.用法,n.规格,n.剂量,m.门诊号,m.姓名,convert(varchar(19),m.处方日期,20) as 处方日期  from prescription_detail_view_m n,prescription_state_m m where m.处方号='" + prescNo + "' and m.处方号=n.处方号 and convert(varchar(12),m.处方日期,103) = convert(varchar(12),getdate(),103)";
                 //,n.生产厂家,convert(varchar(12),m.处方日期,103) as 处方日期
                 //string sql = "select n.处方号,n.药品代码,n.数量,n.单价,n.用法,n.规格,n.剂量 from prescription_detail_view_m n,prescription_state_m m where m.处方号=n.处方号 and convert(varchar(12),m.处方日期,103) = convert(varchar(12),getdate(),103)";
-                string sql = "select " +
+                var sql = "select " +
                     "PRESCRIPTIONNO,DRUGID," +
                     "QUANTITY,PRICE,USEFREQUENCY," +
                     "DRUGSPEC,USEDOSAGE," +
                     "PATIENTNAME,PRESCRIPTIONDATE " +
                     "from PRESCRIPTION_DETAIL_VIEW " +
-                    "where to_char(PRESCRIPTIONDATE, 'yyyymmdd') = to_char(sysdate, 'yyyymmdd')";
+                    "where to_char(PRESCRIPTIONDATE, 'yyyymmdd') = to_char(sysdate, 'yyyymmdd') " +
+                    $"and PRESCRIPTIONNO ='{prescNo}'";
                 cmd = new OracleCommand();
                 cmd.Connection = conn;
                 cmd.CommandText = sql;
@@ -167,6 +169,14 @@ namespace TCTest
                     string num = reader[2].ToString().Trim();
                     string presctionUnit= "";
 
+                    if (checkPrescDetail(prescNo, drugCode))
+                    {
+                        continue;
+                    }
+                    else
+                    {
+                        log.info($"插入明细 prescNo={prescNo} drugCode={drugCode}");
+                    }
                     //log.info($"读取处方明细 姓名{name}");
                     //插入前将药品单位转换：;处方中有的药可能在本地药品库中找不到，需要添加判断，处方中的这种药品是否在本地中有这个药，没有便不执行
                     if (checkDrugView(drugCode))
@@ -283,7 +293,11 @@ namespace TCTest
                             cons.Close();
                         }
                     }
-                    else { presctionUnit = "无药"; }
+
+                    else 
+                    {
+                        presctionUnit = "无药"; 
+                    }
 
                     string strMysql = ConfigurationManager.ConnectionStrings["strCon"].ToString();
                     MySqlConnection con = new MySqlConnection(strMysql);
@@ -373,10 +387,10 @@ namespace TCTest
             return false;
         }
 
-        private bool checkPrescDetail(string presc_no)
+        private bool checkPrescDetail(string presc_no,string drugID)
         {
             //判断本地数据库中处方表没有重复     prescriptiondetail(PrescriptionNo      
-            string localPrescNo = $"select * from prescriptiondetail where PrescriptionNo='{presc_no}'";
+            string localPrescNo = $"select * from prescriptiondetail where PrescriptionNo='{presc_no}' and DrugCode='{drugID}'";
             MySqlConnection conn = new MySqlConnection(ConfigurationManager.ConnectionStrings["strCon"].ToString());
             MySqlDataReader rd = null;
             try
@@ -477,12 +491,9 @@ namespace TCTest
                             cmdM.CommandText = mysql;
                             cmdM.ExecuteNonQuery();
                             //更新最新一条数据到界面
-                            if (!checkPrescDetail(prescNo))
-                            {
-                                prescDetail(prescNo);
-                            }
+                            prescDetail(prescNo);
                             textBox1.Text = "处方号：" + prescNo + "   姓名：" + name;
-                            log.info($"插入到本地成功...姓名={name} 处方号={prescNo} ");
+                            //log.info($"插入到本地成功...姓名={name} 处方号={prescNo} ");
                             Application.DoEvents();
                         }
                         else
@@ -591,13 +602,14 @@ namespace TCTest
         private void drugView()
         {
             string conString = ConfigurationManager.ConnectionStrings["oracleConString"].ToString();
-            OracleConnection conn = new OracleConnection(conString);
+            OracleConnection conn = null;
             OracleDataReader reader = null;
             OracleCommand cmd = null;
             try
             {
                 //string sql = "select 药品代码,药品名称,拼音代码,计量单位,规格,计量,剂型 from drug_view";
                 var sql = "select drugcode,drugname,shortcode,unit,drugspec,dose_per_unit,drugtype from drug_view";
+                conn = new OracleConnection(conString);
                 cmd = new OracleCommand();
                 cmd.Connection = conn;
                 cmd.CommandText = sql;
@@ -613,10 +625,12 @@ namespace TCTest
                     string drugSpec = reader[4].ToString().Trim();
                     string drugJl = reader[5].ToString().Trim();
                     string drugType = reader[6].ToString().Trim();
-                    string num = drugSpec.Substring(drugSpec.IndexOf('*')+1);
+                    string num = "";
+                    if (drugSpec.Contains("*"))
+                         num = drugSpec.Substring(drugSpec.IndexOf('*') + 1);
                     //string drugJUnit = reader[7].ToString();药品计量单位
                     //插入本地数据库
-                    
+
                     string strMysql = ConfigurationManager.ConnectionStrings["strCon"].ToString();
                     MySqlConnection con = new MySqlConnection(strMysql);
                     string mysql = "insert into drug_list(Drug_Code,Drug_Name,Short_Code,Package_Per_Unit,Drug_Spec,Dosage,Type,Package_Per_Box ) values('" + drugcode + "','" + drugname + "','" + drugShort + "','" + drugUnit + "','" + drugSpec + "','" + drugJl + "','" + drugType + "','"+num+"')";
@@ -644,7 +658,7 @@ namespace TCTest
                             }
                             catch (Exception ex)
                             {
-                                log.info("updatedrugview:"+ex.Message);
+                                log.info("updatedrugview:"+ex.Message+ex.StackTrace);
                             }
                             finally
                             {
@@ -654,7 +668,7 @@ namespace TCTest
                     }
                     catch (Exception ex)
                     {
-                        log.info("insertDrugview"+ex.Message);
+                        log.info("insertDrugview"+ex.Message +ex.StackTrace);
                     }
                     finally
                     {
@@ -664,7 +678,7 @@ namespace TCTest
             }
             catch (Exception ex)
             {
-                log.info("readdrugviewfail:"+ex.Message);
+                log.info("readdrugviewfail:"+ex.Message+ex.StackTrace);
             }
             finally
             {
@@ -713,7 +727,7 @@ namespace TCTest
         private void drugExpDate()
         {
             string conString = ConfigurationManager.ConnectionStrings["oracleConString"].ToString();
-            OracleConnection conn = new OracleConnection(conString);
+            OracleConnection conn = null;
             OracleDataReader reader = null;
             OracleCommand cmd = null;
             try
@@ -721,6 +735,7 @@ namespace TCTest
                 //string sql = "select 药品代码,生产批号,convert(varchar(19),有效期,20) as 有效期 ,生产厂家代码 from drug_batch_view";
                 var sql = "select drugid,manubatch,convert(varchar(19),manudate,20) as startDate," +
                     "convert(varchar(19),drugspec,20) as endDate from drug_batch_view";
+                conn = new OracleConnection(conString);
                 cmd = new OracleCommand();
                 cmd.Connection = conn;
                 cmd.CommandText = sql;
@@ -764,7 +779,7 @@ namespace TCTest
                             }
                             catch (Exception ex)
                             {
-                                log.info("updateExpdate"+ex.Message);
+                                log.info("updateExpdate"+ex.Message + ex.StackTrace);
                             }
                             finally
                             {
@@ -774,7 +789,7 @@ namespace TCTest
                     }
                     catch (Exception ex)
                     {
-                        log.info("insertExpdate:"+ex.Message);
+                        log.info("insertExpdate:"+ex.Message+ex.StackTrace);
                     }
                     finally
                     {
@@ -906,6 +921,22 @@ namespace TCTest
             {
                 Console.WriteLine(ex.ToString());
             }
+        }
+
+        private void btnDrugUpdate_Click(object sender, EventArgs e)
+        {
+            Task.Run(()=>
+            {
+                drugView();
+            });
+        }
+
+        private void btnDrugEx_Click(object sender, EventArgs e)
+        {
+            Task.Run(() =>
+            {
+                drugExpDate();
+            });
         }
     }
 }
